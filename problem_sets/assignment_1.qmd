@@ -1,7 +1,8 @@
 ---
-title: "assignment_1"
 format: gfm
 editor: visual
+machine: knittr
+toc: false
 ---
 
 # Assignment 1: Quarto template
