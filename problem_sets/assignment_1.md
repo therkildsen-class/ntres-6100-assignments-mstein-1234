@@ -1,4 +1,5 @@
 ---
+toc: false
 editor_options: 
   markdown: 
     wrap: 72
