@@ -1,0 +1,21 @@
+---
+title: "cars"
+format: html
+editor: visual
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+```
+
+Data viz
+
+```{r}
+cars
+view(cars)
+```
+
+```{r}
+mpg
+```
