@@ -22,6 +22,4 @@ Please use the following table to grade the student's assignment:
 |      8      |                 |                     |               |
 |      9      |                 |                     |               |
 
-Assignment 2:
-
-Assignment 3:
+Assignment 2: <https://github.com/mstein-1234/fruit_veggie_prices>
