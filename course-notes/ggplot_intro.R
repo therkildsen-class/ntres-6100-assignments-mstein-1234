@@ -29,4 +29,7 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
   geom_smooth() +
   facet_wrap(~ year)
 
+ggsave(filename = "plots/cars_data_example.png")
+?ggsave
+
 ggplot(data = mpg)
