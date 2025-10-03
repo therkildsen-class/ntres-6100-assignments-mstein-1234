@@ -15,7 +15,7 @@ table1 |>
   mutate(rate = cases/population * 10000)
 
 table1 |> 
-  group_by(year) |> 
+  group_by(year)|> 
   summarize(total = sum(cases))
 
 table1 |> 
