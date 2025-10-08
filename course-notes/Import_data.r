@@ -28,3 +28,25 @@ msa_clean <-  clean_names(msa)
 msa_clean
 
 parse_number("It is 100%")
+
+parse_double("1,23", locale = locale(decimal_mark = ","))
+
+parse_number("123.456.789", locale = locale(grouping_mark = "."))
+
+mess = read_tsv("https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/refs/heads/main/datasets/messy_data.tsv", locale = locale(decimal_mark = ","), na = c("Missing", "N/A"))
+
+view(mess)
+
+mess |> 
+  mutate(price = parse_number(price)) |> 
+
+
+
+
+
+
+
+
+
+
+
