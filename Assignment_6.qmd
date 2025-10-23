@@ -147,5 +147,33 @@ weather_column <- weather |>
 
 print(weather_column)
 
+```
 
+#### **2.3 Using this cleaned dataset, plot the daily variation in ambient temperature on September 25, 2015, as shown below.**
+
+```{r}
+weather_column |> 
+  filter(date == "2015/09/25") |> 
+  ggplot(
+```
+
+#### **2.4 Plot the daily average ambient temperature throughout the year with a continuous line, as shown below.**
+
+```{r}
+daily_average <- weather_column |> 
+  group_by(date) |> 
+  summarise(daily_average_ambient_temp = mean(AMB_TEMP, na.rm = TRUE)) 
+
+
+|> 
+  ggplot(aes(x = date, y = daily_average_ambient_temp)) +
+           geom_path()
+```
+
+#### **2.4 Plot the daily average ambient temperature throughout the year with a continuous line, as shown below.**
+
+```{r}
+weather_column |> 
+  ggplot() +
+  
 ```
