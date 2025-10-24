@@ -6846,7 +6846,7 @@ for (i in 1:length(dino_masses)){
 ```
 
        user  system elapsed 
-      0.014   0.005   0.019 
+      0.016   0.004   0.019 
 
 Although the for loop in this exercise can be run very quickly, it is
 noticeably slower than the vectorization approach. With more complicated
@@ -6956,9 +6956,6 @@ for (year in start:end){
 **Hint:** `bind_rows()` could be useful for this question.
 
 ``` r
-library(stringr)
-library(readr)
-library(dplyr)
 start <- 1987
 end <- 1992
 df_combined <- NULL
@@ -7039,3 +7036,89 @@ well combine all the raw data in a for loop and clean it up after the
 loop. We recommend you to do the cleanup within the loop though as a
 chance to practice. In the next (optional) question, however, it is
 necessary to clean up the data in the loop before you can combine them.
+
+``` r
+library(dplyr)
+start <- 1987
+end <- 1992
+df_combined <- NULL
+for (year in start:end){
+  path <- str_c("https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/refs/heads/main/datasets/buoydata/44013_", year, ".csv")
+  df <- read_csv((path), na = c("99", "999", "99.00", "999.0")) |>
+    select(YY, MM, WVHT, WTMP) |> 
+    rename(year = YY, month = MM, wave_heights = WVHT, temperatures = WTMP) |> 
+    group_by(month) |> 
+    mutate(
+      avg_height = mean(wave_heights, na.rm = TRUE), 
+      avg_temp = mean(temperatures, na.rm = TRUE),
+      month_year = make_date(year, month))
+  df_combined <- bind_rows(df_combined, df)
+}
+```
+
+    Rows: 7602 Columns: 16
+    ── Column specification ────────────────────────────────────────────────────────
+    Delimiter: ","
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
+
+    ℹ Use `spec()` to retrieve the full column specification for this data.
+    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    Rows: 8071 Columns: 16
+    ── Column specification ────────────────────────────────────────────────────────
+    Delimiter: ","
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
+
+    ℹ Use `spec()` to retrieve the full column specification for this data.
+    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    Rows: 7933 Columns: 16
+    ── Column specification ────────────────────────────────────────────────────────
+    Delimiter: ","
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
+
+    ℹ Use `spec()` to retrieve the full column specification for this data.
+    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    Rows: 8703 Columns: 16
+    ── Column specification ────────────────────────────────────────────────────────
+    Delimiter: ","
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
+
+    ℹ Use `spec()` to retrieve the full column specification for this data.
+    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    Rows: 8730 Columns: 16
+    ── Column specification ────────────────────────────────────────────────────────
+    Delimiter: ","
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
+
+    ℹ Use `spec()` to retrieve the full column specification for this data.
+    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    Rows: 8736 Columns: 16
+    ── Column specification ────────────────────────────────────────────────────────
+    Delimiter: ","
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
+
+    ℹ Use `spec()` to retrieve the full column specification for this data.
+    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+df_combined |> 
+  ggplot(aes(x = month_year, y = avg_height)) +
+  geom_path() +
+  geom_point()
+```
+
+![](Assignment_8_files/figure-commonmark/unnamed-chunk-12-1.png)
+
+``` r
+df_combined |> 
+  ggplot(aes(x = month_year, y = avg_temp)) +
+  geom_path() +
+  geom_point()
+```
+
+![](Assignment_8_files/figure-commonmark/unnamed-chunk-12-2.png)
