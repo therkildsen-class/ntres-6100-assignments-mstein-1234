@@ -1,0 +1,60 @@
+---
+title: "AI_log"
+format: html
+editor: visual
+engine: knitr
+---
+
+## 
+
+1.  Tools Used: chatgpt
+
+2.  Prompt(s): paste exact prompt(s) used
+
+    1.  "can you show individual data points when using geom_path"
+
+        1.  AI output: "Yes — absolutely! `geom_path()` (or `geom_line()`) **only draws lines connecting points by default**, but you can also show the individual points **on top of the line** by adding `geom_point()` to the same plot."
+
+    2.  quarto document shortcut for creating new codechunk in rstudio
+
+        1.  AI output: showed me the right shortcut
+
+3.  Edits made and rationale: what was changed, why, and what was learned
+
+    1.  These didn't lead to huge changes but more helped me when I was stuck. Mostly it was stuff I'd learned before but forgot.
+
+4.  Verification: how correctness was checked (unit tests, small examples, benchmarks)
+
+    1.  These two examples were easy to verify. For the shortcut, I simply tried it in Rstudio. For geom_point(), I just added that line after my geom_path() line and the graph was what I wanted. For both, they were things I've learned before but couldn't remember, so verification was easy
+
+## Reflection questions
+
+#### **Reflection Questions:** 
+
+#### **When is vectorization preferable to loops in R, and when are loops the right choice? Provide two concrete examples from the assignment.**
+
+The assignment this week showed that for loops take more time than vectorization. It didn't have a noticeable effect in this week's example, but would become more relevant as the size of the dataset increases. For loops, on the other hand, seem to give you a greater degree of control over whats being calculated, and would be more useful for more complicated/advanced tasks that require more specification. \
+
+#### **Which AI prompt was most helpful? What did you learn, and how was correctness verified? Include before/after code snippets with commentary.**
+
+I think I've found it most useful for those "wait how do I do this agian?" moments. It's things I've already learned but can't recall at that moment.
+
+code before:
+
+df_combined \|\>
+
+ggplot(aes(x = month_year, y = avg_height)) +
+
+geom_path()
+
+code after:
+
+df_combined \|\>
+
+ggplot(aes(x = month_year, y = avg_height)) +
+
+geom_path() +
+
+geom_point()
+
+In this case, I couldn't remember how to get both the line and the plot points on the same graph. Specifically, I was under the incorrect assumption that to add the points, I should use an argument WITHIN geom_path(), rather than adding geom_point() below. In this case, as soon as I saw the chatgpt response I remembered doing this before. It just sparked my memory. Again this was easy to verify.
