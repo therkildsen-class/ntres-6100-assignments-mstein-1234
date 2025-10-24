@@ -6846,7 +6846,7 @@ for (i in 1:length(dino_masses)){
 ```
 
        user  system elapsed 
-      0.014   0.009   0.023 
+      0.014   0.005   0.019 
 
 Although the for loop in this exercise can be run very quickly, it is
 noticeably slower than the vectorization approach. With more complicated
@@ -6956,90 +6956,64 @@ for (year in start:end){
 **Hint:** `bind_rows()` could be useful for this question.
 
 ``` r
+library(stringr)
+library(readr)
+library(dplyr)
 start <- 1987
 end <- 1992
 df_combined <- NULL
 for (year in start:end){
-  path <- str_c("https://github.com/nt246/NTRES-6100-data-science/blob/main/datasets/buoydata/44013_", year, ".csv")
-  df <- read_csv(path, na = c("99", "999", "99.00", "999.0"))
+  path <- str_c("https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/refs/heads/main/datasets/buoydata/44013_", year, ".csv")
+  df <- read_csv((path), na = c("99", "999", "99.00", "999.0"))
   df_combined <- bind_rows(df_combined, df)
 }
 ```
 
-    Warning: One or more parsing issues, call `problems()` on your data frame for details,
-    e.g.:
-      dat <- vroom(...)
-      problems(dat)
-
-    Rows: 1562 Columns: 1
+    Rows: 7602 Columns: 16
     ── Column specification ────────────────────────────────────────────────────────
     Delimiter: ","
-    chr (1): <!DOCTYPE html>
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
 
     ℹ Use `spec()` to retrieve the full column specification for this data.
     ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-    Warning: One or more parsing issues, call `problems()` on your data frame for details,
-    e.g.:
-      dat <- vroom(...)
-      problems(dat)
-
-    Rows: 1562 Columns: 1
+    Rows: 8071 Columns: 16
     ── Column specification ────────────────────────────────────────────────────────
     Delimiter: ","
-    chr (1): <!DOCTYPE html>
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
 
     ℹ Use `spec()` to retrieve the full column specification for this data.
     ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-    Warning: One or more parsing issues, call `problems()` on your data frame for details,
-    e.g.:
-      dat <- vroom(...)
-      problems(dat)
-
-    Rows: 1562 Columns: 1
+    Rows: 7933 Columns: 16
     ── Column specification ────────────────────────────────────────────────────────
     Delimiter: ","
-    chr (1): <!DOCTYPE html>
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
 
     ℹ Use `spec()` to retrieve the full column specification for this data.
     ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-    Warning: One or more parsing issues, call `problems()` on your data frame for details,
-    e.g.:
-      dat <- vroom(...)
-      problems(dat)
-
-    Rows: 1562 Columns: 1
+    Rows: 8703 Columns: 16
     ── Column specification ────────────────────────────────────────────────────────
     Delimiter: ","
-    chr (1): <!DOCTYPE html>
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
 
     ℹ Use `spec()` to retrieve the full column specification for this data.
     ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-    Warning: One or more parsing issues, call `problems()` on your data frame for details,
-    e.g.:
-      dat <- vroom(...)
-      problems(dat)
-
-    Rows: 1562 Columns: 1
+    Rows: 8730 Columns: 16
     ── Column specification ────────────────────────────────────────────────────────
     Delimiter: ","
-    chr (1): <!DOCTYPE html>
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
 
     ℹ Use `spec()` to retrieve the full column specification for this data.
     ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-    Warning: One or more parsing issues, call `problems()` on your data frame for details,
-    e.g.:
-      dat <- vroom(...)
-      problems(dat)
-
-    Rows: 1562 Columns: 1
+    Rows: 8736 Columns: 16
     ── Column specification ────────────────────────────────────────────────────────
     Delimiter: ","
-    chr (1): <!DOCTYPE html>
+    dbl (13): YY, MM, DD, hh, WD, WSPD, GST, WVHT, DPD, APD, BAR, ATMP, WTMP
+    lgl  (3): MWD, DEWP, VIS
 
     ℹ Use `spec()` to retrieve the full column specification for this data.
     ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
@@ -7048,4 +7022,20 @@ for (year in start:end){
 dim(df_combined)  
 ```
 
-    [1] 9372    1
+    [1] 49775    16
+
+#### **2.4 Building on the workflow that you used in 2.1 - 2.3, use a for loop to read in, clean up, and summarize the buoy data from all years from 1987 to 1992 using a dplyr workflow.**
+
+Within the loop, for each year, **read** in the data, **select** only
+the columns `YY` (year), `MM` (month), `WVHT` (wave heights), `WTMP`
+(temperatures) and **rename** these columns to something understandable,
+and **summarize** monthly averaged wave heights and temperatures
+throughout that year. **Combine** these summary tables from different
+years together and **plot the variation of these monthly averaged values
+through time** as shown below.
+
+There are multiple ways to do this, and for this question, you may as
+well combine all the raw data in a for loop and clean it up after the
+loop. We recommend you to do the cleanup within the loop though as a
+chance to practice. In the next (optional) question, however, it is
+necessary to clean up the data in the loop before you can combine them.
