@@ -1,4 +1,4 @@
-# Assignment_4
+# Assignment_6
 
 
 ## **Exercise 1. Tibble and Data Import**
@@ -31,8 +31,17 @@ library(tidyverse)
 
 ``` r
 library(knitr)
+library(janitor)
+```
 
 
+    Attaching package: 'janitor'
+
+    The following objects are masked from 'package:stats':
+
+        chisq.test, fisher.test
+
+``` r
 tribble(
   ~a, ~b, ~c,
   #--#--#---
@@ -79,6 +88,10 @@ tibble(
 
 #### **1.2 Import `https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/dataset2.txt` into R. Change the column names into “Name”, “Weight”, “Price”.**
 
+``` r
+dataset2 <- read_csv("https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/dataset2.txt", col_names = FALSE)
+```
+
     Rows: 3 Columns: 3
     ── Column specification ────────────────────────────────────────────────────────
     Delimiter: ","
@@ -88,6 +101,16 @@ tibble(
     ℹ Use `spec()` to retrieve the full column specification for this data.
     ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
+``` r
+dataset2 |> 
+  rename(
+    Name = X1,
+    Weight = X2,
+    Price = X3
+  ) |> 
+  print()
+```
+
     # A tibble: 3 × 3
       Name   Weight Price
       <chr>   <dbl> <dbl>
@@ -96,6 +119,18 @@ tibble(
     3 durian     10  19.9
 
 #### **1.3 Import `https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/dataset3.txt` into R. Watch out for the first few lines, missing values, separators, quotation marks, and deliminaters.**
+
+``` r
+read_delim(
+  "https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/dataset3.txt",
+  skip = 2, 
+  col_names = TRUE,
+  na = c("?", "Not Available"),
+  ) |> 
+  clean_names() |> 
+  mutate(name = str_replace_all(name, "/", "")) |> 
+  print()
+```
 
     Rows: 3 Columns: 3
     ── Column specification ────────────────────────────────────────────────────────
@@ -107,11 +142,11 @@ tibble(
     ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
     # A tibble: 3 × 3
-      `/Name/` `/Weight/` `/Price/`
-      <chr>         <dbl>     <dbl>
-    1 /apple/           1       2.9
-    2 /orange/          2      NA  
-    3 /durian/         NA      19.9
+      name   weight price
+      <chr>   <dbl> <dbl>
+    1 apple       1   2.9
+    2 orange      2  NA  
+    3 durian     NA  19.9
 
 #### **1.4 Import `https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/dataset4.txt` into R. Watch out for comments, units, and decimal marks (which are `,` in this case).**
 
@@ -155,7 +190,7 @@ cleaner_data
 
 ## **Exercise 2. Weather station**
 
-his dataset contains the weather and air quality data collected by a
+This dataset contains the weather and air quality data collected by a
 weather station in Taiwan. It was obtained from the Environmental
 Protection Administration, Executive Yuan, R.O.C. (Taiwan).
 
@@ -224,49 +259,108 @@ read_delim(
 warning messages are not necessarily signs of trouble.*
 
 ``` r
-weather <- read_delim(
-  "https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/2015y_Weather_Station.csv",
-  col_names = c("date", "station", "item", "AMB_TEMP", "CO", "NO", "NO2", "NOx", "O3", "PM10", "PM2", "RAINFALL", "RH", "SO2", "WD_HR", "WIND_DIREC", "WIND_SPEED", "WS_HR")
-) 
+weather_raw <- read_delim(
+  "https://raw.githubusercontent.com/nt246/NTRES-6100-data-science/master/datasets/2015y_Weather_Station.csv", na = c("","NA"), col_types = cols(.default = "c")
+  ) 
+
+weather_longer <- weather_raw |> 
+  pivot_longer(
+    cols = matches("^\\d{2}$"), 
+    names_to = "hour", 
+    values_to = "value"
+    ) |> 
+  pivot_wider(values_from = value, names_from = item)
+
+weather_clean <- weather_longer |> 
+  mutate(
+    date = parse_date(date, format = "%Y/%m/%d"),
+    hour = parse_time(hour, format = "%H")
+  ) |> 
+  # Turn all invalid values into NA and turn NR in rainfall into 0
+  mutate(
+    RAINFALL = ifelse(RAINFALL == "NR", "0", RAINFALL)
+  ) |> 
+  # Parse all values into numbers
+  mutate(across(
+    .cols = c(AMB_TEMP:WS_HR),
+    .fns = ~as.numeric(.)
+    )) 
 ```
 
-    Warning: One or more parsing issues, call `problems()` on your data frame for details,
-    e.g.:
-      dat <- vroom(...)
-      problems(dat)
-
-    Rows: 5461 Columns: 27
-    ── Column specification ────────────────────────────────────────────────────────
-    Delimiter: ","
-    chr (23): date, station, item, AMB_TEMP, CO, NO, NO2, NOx, O3, PM10, PM2, RA...
-    dbl  (4): X22, X23, X25, X26
-
-    ℹ Use `spec()` to retrieve the full column specification for this data.
-    ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    Warning: There were 15 warnings in `mutate()`.
+    The first warning was:
+    ℹ In argument: `across(.cols = c(AMB_TEMP:WS_HR), .fns = ~as.numeric(.))`.
+    Caused by warning:
+    ! NAs introduced by coercion
+    ℹ Run `dplyr::last_dplyr_warnings()` to see the 14 remaining warnings.
 
 ``` r
-weather_column <- weather |> 
-  select(-item) |> 
-  slice(-1)
-  
-
-print(weather_column)
+# Show the first 6 rows and 10 columns of this weather_clean without using `kable()`
+weather_clean |> 
+  select(1:10) |> 
+  print(n = 6)
 ```
 
-    # A tibble: 5,460 × 26
-       date      station AMB_TEMP CO    NO    NO2   NOx   O3    PM10  PM2   RAINFALL
-       <chr>     <chr>   <chr>    <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr>   
-     1 2015/01/… Cailiao 16       16    15    15    15    14    14    14    14      
-     2 2015/01/… Cailiao 0.74     0.7   0.66  0.61  0.51  0.51  0.51  0.6   0.62    
-     3 2015/01/… Cailiao 1        0.8   1.1   1.7   2     1.7   1.9   2.4   3.4     
-     4 2015/01/… Cailiao 15       13    13    12    11    13    13    16    16      
-     5 2015/01/… Cailiao 16       14    14    13    13    15    15    18    19      
-     6 2015/01/… Cailiao 35       36    35    34    34    32    30    26    26      
-     7 2015/01/… Cailiao 171      174   160   142   123   110   104   104   109     
-     8 2015/01/… Cailiao 76       78    69    60    52    44    40    41    44      
-     9 2015/01/… Cailiao NR       NR    NR    NR    NR    NR    NR    NR    NR      
-    10 2015/01/… Cailiao 57       57    58    59    59    57    57    56    53      
-    # ℹ 5,450 more rows
-    # ℹ 15 more variables: RH <chr>, SO2 <chr>, WD_HR <chr>, WIND_DIREC <chr>,
-    #   WIND_SPEED <chr>, WS_HR <chr>, X19 <chr>, X20 <chr>, X21 <chr>, X22 <dbl>,
-    #   X23 <dbl>, X24 <chr>, X25 <dbl>, X26 <dbl>, X27 <chr>
+    # A tibble: 8,736 × 10
+      date       station hour   AMB_TEMP    CO    NO   NO2   NOx    O3  PM10
+      <date>     <chr>   <time>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+    1 2015-01-01 Cailiao 00:00        16  0.74   1      15    16    35   171
+    2 2015-01-01 Cailiao 01:00        16  0.7    0.8    13    14    36   174
+    3 2015-01-01 Cailiao 02:00        15  0.66   1.1    13    14    35   160
+    4 2015-01-01 Cailiao 03:00        15  0.61   1.7    12    13    34   142
+    5 2015-01-01 Cailiao 04:00        15  0.51   2      11    13    34   123
+    6 2015-01-01 Cailiao 05:00        14  0.51   1.7    13    15    32   110
+    # ℹ 8,730 more rows
+
+#### **2.3 Using this cleaned dataset, plot the daily variation in ambient temperature on September 25, 2015, as shown below.**
+
+``` r
+weather_clean |> 
+  filter(date == "2015/09/25") |> 
+  ggplot(aes(x = hour, y = AMB_TEMP)) +
+           geom_path()
+```
+
+![](Assignment_6_files/figure-commonmark/unnamed-chunk-7-1.png)
+
+#### **2.4 Plot the daily average ambient temperature throughout the year with a continuous line, as shown below.**
+
+``` r
+weather_clean |> 
+  group_by(date) |> 
+  summarise(daily_average_ambient_temp = mean(AMB_TEMP, na.rm = TRUE)) |> 
+  ggplot(aes(x = date, y = daily_average_ambient_temp)) +
+           geom_path()
+```
+
+![](Assignment_6_files/figure-commonmark/unnamed-chunk-8-1.png)
+
+#### **2.5 Plot the total rainfall per month in a bar chart, as shown below.**
+
+*Hint: separating date into three columns might be helpful.*
+
+``` r
+weather_clean |> 
+  replace_na(list(RAINFALL = 0)) |> 
+  separate(date, into = c("Year", "Month", "Day"), sep = "-") |> 
+  group_by(Month) |> 
+  summarize(monthly_rainfall = sum(RAINFALL)) |> 
+  ggplot(aes(x = Month, y = monthly_rainfall)) + 
+  geom_col()
+```
+
+![](Assignment_6_files/figure-commonmark/unnamed-chunk-9-1.png)
+
+#### **2.6 Plot the daily average ambient temperature throughout the year with a continuous line, as shown below.**
+
+``` r
+unite(weather_clean, time, date, hour, sep=" ") |> 
+  mutate(time = parse_datetime(time)) |> 
+  filter(time<=parse_datetime("2015-09-08"), time>=parse_datetime("2015-09-01"), !is.na(PM2.5))  |> 
+  ggplot(aes(x=time, y=PM2.5))+
+  geom_line()
+```
+
+![](Assignment_6_files/figure-commonmark/unnamed-chunk-10-1.png)
+
+#### 
