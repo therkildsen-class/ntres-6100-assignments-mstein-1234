@@ -29,11 +29,11 @@ engine: knitr
 
 ## Reflection questions
 
-#### **Reflection Questions:** 
+#### **Reflection Questions:**
 
 #### **When is vectorization preferable to loops in R, and when are loops the right choice? Provide two concrete examples from the assignment.**
 
-The assignment this week showed that for loops take more time than vectorization. It didn't have a noticeable effect in this week's example, but would become more relevant as the size of the dataset increases. For loops, on the other hand, seem to give you a greater degree of control over whats being calculated, and would be more useful for more complicated/advanced tasks that require more specification. \
+The assignment this week showed that for loops take more time than vectorization. It didn't have a noticeable effect in this week's example, but would become more relevant as the size of the dataset increases. For loops, on the other hand, seem to give you a greater degree of control over whats being calculated, and would be more useful for more complicated/advanced tasks that require more specification.\
 
 #### **Which AI prompt was most helpful? What did you learn, and how was correctness verified? Include before/after code snippets with commentary.**
 
